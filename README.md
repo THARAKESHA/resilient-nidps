@@ -29,14 +29,16 @@ Under such stress, traditional static ML models suffer catastrophic **performanc
 
 ```mermaid
 flowchart LR
-    Traffic[Network Flow] --> TQM[Telemetry Quality Monitor\nComputes Q(t)]
-    TQM --> Arbiter[Dynamic Arbiter\n±0.05 Hysteresis]
-    Arbiter -->|Q >= 0.80| M1[Mode 1: Full ML\n78 Features]
-    Arbiter -->|0.40 <= Q < 0.80| M2[Mode 2: Degraded ML\n16 L3/L4 Features]
-    Arbiter -->|Q < 0.40| M3[Mode 3: Fallback Rules\nVolumetric Invariants]
-    M1 & M2 & M3 --> Prev[Adaptive Prevention Engine]
-    Prev --> Drop[Firewall DROP IP]
-    Prev --> Rate[Token-Bucket Rate Limit]
+    Traffic["Network Flow"] --> TQM["Telemetry Quality Monitor<br/>Computes Q(t)"]
+    TQM --> Arbiter["Dynamic Arbiter<br/>±0.05 Hysteresis"]
+    Arbiter -->|"Q >= 0.80"| M1["Mode 1: Full ML<br/>78 Features"]
+    Arbiter -->|"0.40 <= Q < 0.80"| M2["Mode 2: Degraded ML<br/>16 L3/L4 Features"]
+    Arbiter -->|"Q < 0.40"| M3["Mode 3: Fallback Rules<br/>Volumetric Invariants"]
+    M1 --> Prev["Adaptive Prevention Engine"]
+    M2 --> Prev
+    M3 --> Prev
+    Prev --> Drop["Firewall DROP IP"]
+    Prev --> Rate["Token-Bucket Rate Limit"]
 ```
 
 ---
