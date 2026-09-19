@@ -105,14 +105,4 @@ Outputs high-res vector plot to `results/resilience_curves.png` and LaTeX table 
 └── paper/                      # IEEE LaTeX manuscript, references.bib, and PDF
 ```
 
----
 
-## 📜 Citation
-```bibtex
-@article{tidps2026resilient,
-  title={Resilient Network Intrusion Detection via Telemetry-Aware Multi-Mode Arbitration and Graceful Degradation},
-  author={Anonymous},
-  journal={Department of Computer Science and Engineering},
-  year={2026}
-}
-```
