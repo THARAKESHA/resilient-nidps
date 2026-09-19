@@ -9,7 +9,10 @@ Supports cross-platform firewall integration:
 
 import time
 import platform
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+# Localized to Indian Standard Time (IST, UTC+5:30) for accurate cloud-to-local synchronization
+LOCAL_TZ = timezone(timedelta(hours=5, minutes=30))
 
 CURRENT_OS = platform.system() # 'Windows' or 'Linux'
 
@@ -28,7 +31,7 @@ class PreventionAlertingEngine:
         Executes adaptive response based on detected attack type and severity.
         Generates cross-platform firewall commands for Linux and Windows PowerShell.
         """
-        timestamp_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        timestamp_str = datetime.now(LOCAL_TZ).strftime("%Y-%m-%d %H:%M:%S")
         
         if attack_label == 0:
             # Benign - No alert or prevention needed
