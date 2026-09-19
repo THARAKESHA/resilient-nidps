@@ -106,13 +106,19 @@ def load_models_and_resources():
     
     # Generate interactive flow pool
     X_pool, y_pool = generate_calibrated_benchmark_dataset(num_samples=2000, random_seed=99)
-    arbiter = ModeArbiter(tau_high=0.80, tau_low=0.40, delta=0.05)
-    prevention = PreventionAlertingEngine()
-    
-    return m1, m2, m3, X_pool, y_pool, arbiter, prevention
+    return m1, m2, m3, X_pool, y_pool
 
 
-m1_full, m2_deg, m3_fall, X_pool, y_pool, arbiter, prevention = load_models_and_resources()
+m1_full, m2_deg, m3_fall, X_pool, y_pool = load_models_and_resources()
+
+# Session-isolated state for dynamic arbitration & alerting
+if "arbiter" not in st.session_state:
+    st.session_state.arbiter = ModeArbiter(tau_high=0.80, tau_low=0.40, delta=0.05)
+arbiter = st.session_state.arbiter
+
+if "prevention" not in st.session_state:
+    st.session_state.prevention = PreventionAlertingEngine()
+prevention = st.session_state.prevention
 
 # =============================================================================
 # SIDEBAR CONTROLS
@@ -309,7 +315,20 @@ with tab1:
         recent_alerts = prevention.get_recent_alerts(limit=8)
         if recent_alerts:
             alerts_df = pd.DataFrame(recent_alerts)[["timestamp", "src_ip", "attack_type", "severity", "action_taken", "active_mode"]]
+            alerts_df = alerts_df.rename(columns={
+                "timestamp": "Timestamp (IST)",
+                "src_ip": "Source IP",
+                "attack_type": "Threat",
+                "severity": "Severity",
+                "action_taken": "Action",
+                "active_mode": "Mode"
+            })
             st.dataframe(alerts_df, width="stretch", hide_index=True)
+            if st.button("🗑️ Clear Incident Ledger", use_container_width=True):
+                prevention.alert_history.clear()
+                prevention.firewall_blocklist.clear()
+                prevention.rate_limited_ips.clear()
+                st.rerun()
         else:
             st.info("No security incidents detected. Telemetry stream is currently clean.")
             
